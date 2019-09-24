@@ -1,7 +1,5 @@
-const numbers = [99, 44, 6, 2, 1, 5, 63, 87, 283, 4, 0];
-
 function selectionSort(arrayToSort) {
-  let sortedArray = arrayToSort;
+  let sortedArray = arrayToSort.slice();
 
   // check every element in unsorted array
   for (let currentIndex = 1; currentIndex < sortedArray.length; currentIndex++) {
@@ -18,18 +16,15 @@ function selectionSort(arrayToSort) {
           }
       }
 
-      console.log(`curEl: ${currentIndex} maxValue: ${maxValue}`);
+      // console.log(`curEl: ${currentIndex} maxValue: ${maxValue}`);
 
       // swap subarray[lastValue] with founded max in unsorted subarray
       let lastValue = sortedArray[sortedArray.length - currentIndex];
       sortedArray[sortedArray.indexOf(maxValue)] = lastValue;
       sortedArray[sortedArray.length - currentIndex] = maxValue;
 
-      console.log(`max of subarray ${sortedArray[sortedArray.length - currentIndex]} sortedArray: ${sortedArray}`);
+      // console.log(`max of subarray ${sortedArray[sortedArray.length - currentIndex]} sortedArray: ${sortedArray}`);
   }
 
   return sortedArray;
 }
-
-selectionSort(numbers);
-console.log(numbers);

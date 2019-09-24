@@ -1,7 +1,5 @@
-const numbers = [99, 44, 6, 2, 1, 5, 63, 87, 283, 4, 0];
-
 function insertionSort(arrayToSort) {
-  let sortedArray = arrayToSort;
+  let sortedArray = arrayToSort.slice();
   
   // check every element in unsorted array
   for (let currentIndex = 1; currentIndex < sortedArray.length; currentIndex++) {
@@ -19,10 +17,7 @@ function insertionSort(arrayToSort) {
           }
       }
 
-      console.log(`curEl: ${currentIndex} sorted array: ${sortedArray}`);
+      // console.log(`curEl: ${currentIndex} sorted array: ${sortedArray}`);
   }
   return sortedArray;
 }
-
-insertionSort(numbers);
-console.log(numbers);
