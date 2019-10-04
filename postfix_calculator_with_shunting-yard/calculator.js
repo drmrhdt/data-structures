@@ -47,12 +47,6 @@ class Calculator {
     
     if (!stack.isEmpty()) { // after while loop, if operator stack not null
         while (!stack.isEmpty()) queue.enqueue(stack.pop()); // pop everything to output queue
-    } 
-    else { // if there are no more tokens to read then:
-      while (!stack.isEmpty()) { // while there are still operator tokens on the stack
-        if (stack.peek() === '(' || stack.peek() === ')') throw new Error('Mismatched parentheses!'); /* if the operator token on the top of the stack is a paren, then there are mismatched parentheses. */
-        else queue.enqueue(stack.pop()); // pop the operator from the operator stack onto the output queue.
-      }
     }
         
     const postfix = [];
