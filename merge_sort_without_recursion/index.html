@@ -12,48 +12,56 @@
     function mergeSortWithoutRecursion(array) {
         // break array into individual arrays of single integers
         let result = array.map(num => [num]);
+
         // keep merging until result contains a single array
         while (result.length > 1) {
             const oddNumbered = result.length % 2 !== 0;
             let temp = [];
+
             // iterate 2 subarrays at a time and merge into larger subarray
             for (let i = 0; i < result.length; i += 2) {
-                let arr1 = result[i];
-                let arr2 = result[i + 1];
-                // pre-merge 3 subarrays into 2 if there are odd number of subarrays
-                if (oddNumbered && i === (result.length - 3)) {
-                    arr2 = merge(arr2, result[i + 2]);
-                    i++;
-                }
-                // accumulate intermediate result
-                temp.push(merge(arr1, arr2));
-            }
-            // current level merged, update result
-            result = temp;
+            let arr1 = result[i];
+            let arr2 = result[i + 1];
+
+            // pre-merge 3 subarrays into 2 if there are odd number of subarrays
+            if (oddNumbered && i === (result.length - 3)) {
+            arr2 = merge(arr2, result[i + 2]);
+            i++;
+            console.log(`MERGED ODDED: ${arr2}`)
         }
-        return result[0];
+        // accumulate intermediate result
+        temp.push(merge(arr1, arr2));
+        }
+        // current level merged, update result
+        result = temp;
+    }
+    return result[0];
     }
 
-    function merge(arr1, arr2) {
+    function merge (arr1, arr2) {
         const merged = [];
         let cur1 = 0; // current element in first array
         let cur2 = 0; // current elemnet in second array
+  
+        console.log(`MERGING: ${arr1}, ${arr2}`);
         // keep merge until we get one array sized like arr1 + arr2
         while (merged.length !== (arr1.length + arr2.length)) {
             if (arr2[cur2] === undefined || arr1[cur1] <= arr2[cur2]) {
                 merged.push(arr1[cur1]);
+                console.log(`1st condition: ${merged}`);
                 cur1++;
             } else if (arr1[cur1] === undefined || arr1[cur1] > arr2[cur2]) {
                 merged.push(arr2[cur2]);
                 cur2++;
+                console.log(`2nd condition: ${merged}`);
             }
         }
-        console.log(merged);
+        console.log(`MERGED: ${merged}`)
         return merged;
     }
-    console.log(mergeSortWithoutRecursion([345, 12, 7, 123, 9910, 71, 3, 0])); // even n
-    console.log(mergeSortWithoutRecursion([345, 12, 7, 123, 9910, 71, 3, 0, 100])); // odd n
-    
+
+    console.log(mergeSortWithoutRecursion([345, 12, 7, 123, 9910, 71, 3, 0]));  // even n
+    console.log(mergeSortWithoutRecursion([345, 12, 7, 123, 9910, 71, 3, 0, 100]));  // odd n
     </script>
 </body>
 
