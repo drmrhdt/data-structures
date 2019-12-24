@@ -4,9 +4,284 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 </head>
+<style>
+	.container {
+		width: 90%;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+	}
+	.form {
+		display: flex;
+	}
+</style>
 <body>
-	<script src="doublyLinkedListClassImplementation.js"></script>
-	<script src="createAndFillDoubleList.js"></script>
-	<script src="romanToArabic.js"></script>
+	<div id="container" class="container">
+		<div id="form" class="form">
+			<input id="input" placeholder="Enter roman number" />
+			<button id="convert-btn">Convert</button>
+		</div>
+	</div>
+	<script>
+		const convertBtn = document.getElementById('convert-btn'),
+			  container = document.getElementById('container'),
+			  input = document.getElementById('input');
+
+		let result;
+
+		input.focus();
+
+		const displayResult = () => {
+			const result = romanToArabic(input.value.toUpperCase());
+			console.log(result);
+
+			container.insertAdjacentHTML('beforeend', 
+							  `<p>Roman number: ${result.number} </p>
+							   <p>Arabic number: ${result.amount} </p>
+							   <p>Evaluations: ${result.evaluations ? result.evaluations.map(evaluation => evaluation) : 'No'} </p>`);
+		} 
+
+		convertBtn.addEventListener('click', () => displayResult())
+
+	</script>
+	<script>
+		class DoublyLinkedList {
+  constructor(value) {
+    this.head = {
+      value: value,
+      next: null,
+      prev: null
+    };
+    this.tail = this.head;
+    this.length = 1;
+  }
+  append(value) {
+    const newNode = {
+      value: value,
+      next: null,
+      prev: null
+    }
+    // console.log(newNode)
+    newNode.prev = this.tail
+    this.tail.next = newNode;
+    this.tail = newNode;
+    this.length++;
+    return this;
+  }
+  prepend(value) {
+    const newNode = {
+      value: value,
+      next: null,
+      prev: null
+    }
+    newNode.next = this.head;
+    this.head.prev = newNode
+    this.head = newNode;
+    this.length++;
+    return this;
+  }
+  printList() {
+    const array = [];
+    let currentNode = this.head;
+    while (currentNode !== null) {
+      array.push(currentNode.value)
+      currentNode = currentNode.next
+    }
+    return array;
+  }
+  insert(index, value) {
+    //Check for proper parameters;
+    if (index >= this.length) {
+      return this.append(value);
+    }
+
+    const newNode = {
+      value: value,
+      next: null,
+      prev: null
+    }
+    const leader = this.traverseToIndex(index - 1);
+    const follower = leader.next;
+    leader.next = newNode;
+    newNode.prev = leader;
+    newNode.next = follower;
+    follower.prev = newNode;
+    this.length++;
+    console.log(this)
+    return this.printList();
+  }
+  traverseToIndex(index) {
+    //Check parameters
+    let counter = 0;
+    let currentNode = this.head;
+    while (counter !== index) {
+      currentNode = currentNode.next;
+      counter++;
+    }
+    return currentNode;
+  }
+}
+
+// let myLinkedList = new DoublyLinkedList(5);
+// myLinkedList.append(5)
+// myLinkedList.append(16)
+// myLinkedList.prepend(1)
+// myLinkedList.insert(2, 99)
+// myLinkedList.insert(20, 88)
+// myLinkedList.printList()
+// myLinkedList.remove(2)
+// myLinkedList.reverse()
+
+
+function createAndFillDoubleList(array) {
+  let list = new DoublyLinkedList(array[0]);
+  for (let index = 1; index < array.length; index++) {
+    list.insert(index, array[index]);
+  }
+
+  return list;
+}
+
+/************** algorithm for WHOLE NUMBER 
+ * If it's tail's node we add the last triplet to amount
+ * if it's not tail's node, we add current node
+ ***************/
+
+function romanToArabic(romanNumber) {
+
+  const number = romanNumber.split(''),
+    list = createAndFillDoubleList(number),
+    dict = {
+      'I': 1,
+      'V': 5,
+      'X': 10,
+      'L': 50,
+      'C': 100,
+      'D': 500,
+      'M': 1000
+    },
+    numbers = [10, 100, 1000]
+
+  let amount = 0,
+    tripletAmount = 0,
+    triplets = new Map(),
+    output = { number: romanNumber },
+    evaluations = [],
+    node = list.head;
+
+  if (list.length === 1) {
+    output.amount = dict[node.value];
+    output.triplets = triplets.set('No triplets', 0);
+    return output;
+
+  } 
+  else if (list.length === 2) {
+    if (numbers.includes(dict[node.value] + dict[node.next.value])) {
+      output.error = 'ERROR';
+      return output;
+    } 
+    else if (dict[node.value] < dict[node.next.value]) {
+      output.amount = dict[node.next.value] - dict[node.value];
+      output.triplets = triplets.set('No triplets', 0);
+      return output;
+    }
+    else {
+      output.amount = dict[node.next.value] + dict[node.value];
+      output.triplets = triplets.set('No triplets', 0);
+      return output;
+    }
+  } 
+  else if (list.length > 2) {
+    while (node.next) {
+
+      // don't stop on head and tail, currentNode on start is 1
+      if (node.prev && node.next) {
+
+        /***** CHECK GRAMMAR *****/
+        // wrong: if value + value = 10/100/1000 ('VV/LL/DD')
+        // wrong: or (value1 === value1) < value2 (f.e. 'XXL')
+        // wrong: or unknown letter 
+        // wrong: 'IIII'
+        if (numbers.includes((dict[node.prev.value] + dict[node.value])) ||
+          numbers.includes((dict[node.value] + dict[node.next.value])) ||
+          node.value === node.prev.value &&
+          dict[node.value] < dict[node.next.value] ||
+          !dict[node.prev.value] ||
+          !dict[node.value] ||
+          !dict[node.next.value] ||
+          romanNumber.includes('IIII')) {
+            output.error = 'ERROR';
+            return output;
+          }
+
+        /***** GETTING TRIPLETS and whole number (amount) *****/
+        // value2 < value3 ('IX')
+        else if (dict[node.next.value] > dict[node.value])
+          tripletAmount = dict[node.next.value] - dict[node.value];
+        // value2 > value3 ('XI') or value2 === value3 ('XX')
+        else if (dict[node.next.value] < dict[node.value] || dict[node.next.value] === dict[node.value])
+          tripletAmount = dict[node.next.value] + dict[node.value];
+
+        // value1 < value2
+        if (dict[node.value] > dict[node.prev.value]) {
+          tripletAmount -= dict[node.prev.value];
+
+          // 1. If it's tail's node we add the last triplet to amount
+          if (node.next === list.tail) {
+            evaluations.push(`tail: ${amount} + ${tripletAmount} = ${amount + tripletAmount}`);
+            amount += tripletAmount;
+          } else {
+            // 2. if it's not head's/tail's node, we substract current node
+            evaluations.push(`${amount} - ${dict[node.prev.value]} = ${amount - dict[node.prev.value]}`);
+            amount -= dict[node.prev.value];
+          }
+        }
+        // 4. value1 < value2 ('IX') or value1 == value2 ('XX')
+        else if (dict[node.value] < dict[node.prev.value] || dict[node.value] === dict[node.prev.value]) {
+          tripletAmount += dict[node.prev.value];
+
+          // 1. If it's tail's node we add the last triplet to amount
+          if (node.next === list.tail) {
+            evaluations.push(`tail: ${amount} + ${tripletAmount} = ${amount + tripletAmount}`);
+            amount += tripletAmount;
+          } else {
+            if (node.next.next) {
+              // 2 if it's not head's/tail's node, we add current node
+              evaluations.push(`${amount} + ${dict[node.prev.value]} = ${amount + dict[node.prev.value]}`);
+              amount += dict[node.prev.value];
+            }
+          }
+        }
+
+        triplets.set(node.prev.value + node.value + node.next.value, tripletAmount);
+
+        // if (list.length === 3) {
+          // amount = tripletAmount;
+        // }
+
+      }
+
+      node = node.next;
+    }
+  }
+
+  /***** LAST CHECK *****/
+  // wrong: roman number can't be more than 3999
+  if (amount >= 4000) {
+    output.error = 'ERROR';
+    return output;
+  }
+  else {
+    output.amount = amount,
+    output.triplets = triplets,
+    output.evaluations = evaluations
+    return output;
+  }
+}
+
+// let tests = ['CDLXXVII', 'IIIV', 'VIII', 'II', 'XI', 'I', 'MIX', 'VV', 'XX', 'XXL', 'III', 'MMMCMXCX', 'IIII', 'CLL', 'IIIV', 'AXX', 'MMMM', 'MMMCMXCIX', 'MMMCMXCV', 'XXXIX'];
+// // tests = ['MMMCMXCIX'];
+// tests.map(test => romanToArabic(test));
+	</script>
 </body>
 </html>
